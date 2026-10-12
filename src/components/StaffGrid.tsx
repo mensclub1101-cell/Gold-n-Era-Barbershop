@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { barbers, locations, locationName } from "@/lib/shop";
+import { barbers, locations, locationName, telHref } from "@/lib/shop";
 
 const tabs = [{ slug: "all", name: "All" }, ...locations.map((l) => ({ slug: l.slug, name: l.name }))];
 
@@ -58,14 +58,35 @@ export function StaffGrid() {
                 </span>
               )}
             </div>
-            <p className="mt-4 text-sm text-ink-2">{b.specialty}</p>
-            <button
-              disabled
-              className="mt-6 rounded-full border border-ink px-4 py-2 text-sm font-semibold text-ink opacity-60"
-              title="Online booking opens soon"
-            >
-              Booking opens soon
-            </button>
+            {b.specialty && <p className="mt-4 text-sm text-ink-2">{b.specialty}</p>}
+            <div className="mt-auto flex gap-2 pt-6">
+              {b.bookingUrl ? (
+                <a
+                  href={b.bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 rounded-full bg-ink px-4 py-2 text-center text-sm font-semibold text-paper transition hover:bg-ink-2"
+                >
+                  Book with {b.name.split(" ")[0]}
+                </a>
+              ) : (
+                <button
+                  disabled
+                  className="flex-1 rounded-full border border-ink px-4 py-2 text-sm font-semibold text-ink opacity-60"
+                >
+                  Booking opens soon
+                </button>
+              )}
+              {b.phone && (
+                <a
+                  href={telHref(b.phone)}
+                  aria-label={`Call ${b.name} at ${b.phone}`}
+                  className="rounded-full border border-ink px-4 py-2 text-sm font-semibold text-ink transition hover:bg-ink hover:text-paper"
+                >
+                  Call
+                </a>
+              )}
+            </div>
           </li>
         ))}
       </ul>

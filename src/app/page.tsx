@@ -8,6 +8,7 @@ import {
   locations,
   mapsUrl,
   reviews,
+  telHref,
   type Location,
 } from "@/lib/shop";
 
@@ -59,7 +60,7 @@ function LocationCard({ location, index }: { location: Location; index: number }
           </a>
           {location.phone && (
             <a
-              href={`tel:${location.phone.replace(/[^\d+]/g, "")}`}
+              href={telHref(location.phone)}
               className="rounded-full border border-paper/40 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-paper"
             >
               Call {location.phone}

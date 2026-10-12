@@ -17,7 +17,9 @@ export type Location = {
 export type Barber = {
   name: string;
   location: string; // Location slug
-  specialty: string;
+  specialty: string | null;
+  phone: string | null;
+  bookingUrl: string | null; // Each booth-rent barber's own booking page
   sample?: boolean;
 };
 
@@ -62,12 +64,44 @@ export const locations: Location[] = [
 ];
 
 export const barbers: Barber[] = [
-  { name: "Barber One", location: "pigeon-pass", specialty: "Skin fades", sample: true },
-  { name: "Barber Two", location: "pigeon-pass", specialty: "Beard sculpting", sample: true },
-  { name: "Barber Three", location: "pigeon-pass", specialty: "Tapers & designs", sample: true },
-  { name: "Barber Four", location: "moreno-beach", specialty: "Classic scissor cuts", sample: true },
-  { name: "Barber Five", location: "moreno-beach", specialty: "Kids' cuts", sample: true },
-  { name: "Barber Six", location: "moreno-beach", specialty: "Hot towel shaves", sample: true },
+  {
+    name: "Frio Fadez",
+    location: "pigeon-pass",
+    specialty: null,
+    phone: "(323) 244-0211",
+    bookingUrl: "https://book.thecut.co/FrioFadez",
+  },
+  {
+    name: "Eshaud Gibson",
+    location: "pigeon-pass",
+    specialty: null,
+    phone: "(951) 287-1258",
+    bookingUrl: "https://book.thecut.co/Dro--Gibson-dgf052w",
+  },
+  {
+    name: "Jonathan the Barber",
+    location: "pigeon-pass",
+    specialty: null,
+    phone: "(951) 378-1206",
+    bookingUrl: "https://jonathanthebarberr.booksy.com/a/",
+  },
+  {
+    name: "Ramón Blendz",
+    location: "pigeon-pass",
+    specialty: null,
+    phone: "(951) 705-3117",
+    bookingUrl: "https://raymondbn1s.setmore.com/raymondreyes",
+  },
+  {
+    name: "Norm Barber",
+    location: "pigeon-pass",
+    specialty: null,
+    phone: "(323) 715-8982",
+    bookingUrl: "https://book.thecut.co/AllHairNoGrease",
+  },
+  { name: "Barber Four", location: "moreno-beach", specialty: "Classic scissor cuts", phone: null, bookingUrl: null, sample: true },
+  { name: "Barber Five", location: "moreno-beach", specialty: "Kids' cuts", phone: null, bookingUrl: null, sample: true },
+  { name: "Barber Six", location: "moreno-beach", specialty: "Hot towel shaves", phone: null, bookingUrl: null, sample: true },
 ];
 
 export const reviews: Review[] = [
@@ -101,6 +135,10 @@ export function fullAddress(l: Location) {
 export function mapsUrl(l: Location) {
   const q = encodeURIComponent(`${brand.name}, ${fullAddress(l)}`);
   return `https://www.google.com/maps/search/?api=1&query=${q}`;
+}
+
+export function telHref(phone: string) {
+  return `tel:${phone.replace(/[^\d+]/g, "")}`;
 }
 
 export function locationName(slug: string) {
