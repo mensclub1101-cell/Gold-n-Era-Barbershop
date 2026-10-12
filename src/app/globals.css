@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #ffffff;
+  --paper-2: #f4f4f2;
+  --ink: #0b0b0b;
+  --ink-2: #1c1c1c;
+  --muted: #6b6b6b;
+  --line: #e4e4e0;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-oswald);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Barber-pole stripe used as a decorative band and on cards without a photo. */
+.stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--ink) 0 14px,
+    var(--paper) 14px 28px
+  );
+}
+
+.stripes-soft {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.05) 0 14px,
+    transparent 14px 28px
+  );
+}

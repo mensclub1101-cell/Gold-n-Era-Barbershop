@@ -1,0 +1,233 @@
+import Link from "next/link";
+import { SiteHeader, Wordmark } from "@/components/SiteHeader";
+import { StaffGrid } from "@/components/StaffGrid";
+import {
+  brand,
+  fullAddress,
+  locationName,
+  locations,
+  mapsUrl,
+  reviews,
+  type Location,
+} from "@/lib/shop";
+
+function SectionHeading({ eyebrow, title, children }: { eyebrow: string; title: string; children?: React.ReactNode }) {
+  return (
+    <div className="mb-10 max-w-2xl">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-muted">{eyebrow}</p>
+      <h2 className="font-display text-4xl font-semibold uppercase tracking-wide sm:text-5xl">{title}</h2>
+      {children && <p className="mt-4 text-ink-2">{children}</p>}
+    </div>
+  );
+}
+
+function LocationCard({ location, index }: { location: Location; index: number }) {
+  return (
+    <article className="relative flex min-h-[26rem] flex-col justify-end overflow-hidden rounded-3xl bg-ink text-paper">
+      {location.photo ? (
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center grayscale"
+          style={{ backgroundImage: `url(${location.photo})` }}
+        />
+      ) : (
+        <div aria-hidden className="stripes-soft absolute inset-0" />
+      )}
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/10" />
+
+      <div className="relative p-6 sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-paper/60">
+          Location {String(index + 1).padStart(2, "0")}
+        </p>
+        <h3 className="mt-2 font-display text-3xl font-semibold uppercase tracking-wide sm:text-4xl">
+          {location.name}
+        </h3>
+        <address className="mt-3 not-italic text-paper/80">
+          {location.street}
+          <br />
+          {location.city}, {location.region} {location.postalCode}
+        </address>
+        <p className="mt-3 text-sm text-paper/60">{location.hours ?? "Hours coming soon"}</p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <a
+            href={mapsUrl(location)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-full bg-paper px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-paper-2"
+          >
+            Get directions
+          </a>
+          {location.phone && (
+            <a
+              href={`tel:${location.phone.replace(/[^\d+]/g, "")}`}
+              className="rounded-full border border-paper/40 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-paper"
+            >
+              Call {location.phone}
+            </a>
+          )}
+          <a
+            href="#staff"
+            className="rounded-full border border-paper/40 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-paper"
+          >
+            See barbers
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function Stars({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-0.5" aria-label={`${rating} out of 5 stars`}>
+      {Array.from({ length: 5 }, (_, i) => (
+        <svg key={i} viewBox="0 0 20 20" className={`h-4 w-4 ${i < rating ? "fill-ink" : "fill-line"}`} aria-hidden>
+          <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <>
+      <SiteHeader />
+
+      <main className="flex-1">
+        {/* Hero */}
+        <section className="relative overflow-hidden bg-ink text-paper">
+          <div aria-hidden className="stripes-soft absolute inset-0" />
+          <div className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-paper/60">
+              {brand.city} · Two locations
+            </p>
+            <h1 className="mt-6 font-display text-6xl font-bold uppercase leading-[0.9] tracking-wide sm:text-8xl">
+              Gold&rsquo;n
+              <br />
+              Era
+            </h1>
+            <p className="mt-6 max-w-xl text-lg text-paper/80">{brand.tagline}</p>
+            <div className="mt-10 flex flex-wrap gap-3">
+              <a
+                href="#locations"
+                className="rounded-full bg-paper px-6 py-3 text-sm font-semibold uppercase tracking-wider text-ink transition hover:bg-paper-2"
+              >
+                Find a location
+              </a>
+              <a
+                href="#staff"
+                className="rounded-full border border-paper/40 px-6 py-3 text-sm font-semibold uppercase tracking-wider text-paper transition hover:border-paper"
+              >
+                Meet the barbers
+              </a>
+            </div>
+          </div>
+        </section>
+        <div aria-hidden className="stripes h-3" />
+
+        {/* Locations */}
+        <section id="locations" className="scroll-mt-16 mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+          <SectionHeading eyebrow="Two shops" title="Locations">
+            Same standard at both chairs. Pick the shop closest to you.
+          </SectionHeading>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {locations.map((l, i) => (
+              <LocationCard key={l.slug} location={l} index={i} />
+            ))}
+          </div>
+        </section>
+
+        {/* Staff */}
+        <section id="staff" className="scroll-mt-16 border-y border-line bg-paper-2">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+            <SectionHeading eyebrow="The team" title="Barbers">
+              Every barber runs their own chair. Find your barber and book with them directly.
+            </SectionHeading>
+            <StaffGrid />
+          </div>
+        </section>
+
+        {/* Reviews */}
+        <section id="reviews" className="scroll-mt-16 mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+          <SectionHeading eyebrow="Word of mouth" title="Reviews" />
+          <ul className="grid gap-4 md:grid-cols-3">
+            {reviews.map((r, i) => (
+              <li key={i} className="flex flex-col rounded-2xl border border-line p-6">
+                <div className="flex items-center justify-between">
+                  <Stars rating={r.rating} />
+                  {r.sample && (
+                    <span className="rounded-full bg-paper-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted">
+                      Sample
+                    </span>
+                  )}
+                </div>
+                <blockquote className="mt-4 flex-1 text-ink-2">&ldquo;{r.body}&rdquo;</blockquote>
+                <p className="mt-6 text-sm font-semibold">{r.author}</p>
+                <p className="text-xs uppercase tracking-wider text-muted">{locationName(r.location)}</p>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8 flex flex-wrap gap-3">
+            {locations.map((l) => (
+              <a
+                key={l.slug}
+                href={mapsUrl(l)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full border border-ink px-5 py-2.5 text-sm font-semibold transition hover:bg-ink hover:text-paper"
+              >
+                Review {l.name} on Google
+              </a>
+            ))}
+          </div>
+        </section>
+
+        {/* Account CTA */}
+        <section className="bg-ink text-paper">
+          <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 py-16 sm:px-6 md:flex-row md:items-center">
+            <div>
+              <h2 className="font-display text-3xl font-semibold uppercase tracking-wide">One account, your chair</h2>
+              <p className="mt-2 text-paper/70">
+                Clients book and track their cuts. Barbers manage their own chair.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Link
+                href="/login"
+                className="rounded-full border border-paper/40 px-6 py-3 text-sm font-semibold uppercase tracking-wider transition hover:border-paper"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-full bg-paper px-6 py-3 text-sm font-semibold uppercase tracking-wider text-ink transition hover:bg-paper-2"
+              >
+                Sign up
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-line">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3">
+          <Wordmark />
+          {locations.map((l) => (
+            <div key={l.slug} className="text-sm">
+              <p className="font-semibold uppercase tracking-wider">{l.name}</p>
+              <a href={mapsUrl(l)} target="_blank" rel="noopener noreferrer" className="text-muted hover:text-ink">
+                {fullAddress(l)}
+              </a>
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-line">
+          <p className="mx-auto max-w-6xl px-4 py-6 text-xs text-muted sm:px-6">
+            © {brand.name}. Site by ProlificX.
+          </p>
+        </div>
+      </footer>
+    </>
+  );
+}
