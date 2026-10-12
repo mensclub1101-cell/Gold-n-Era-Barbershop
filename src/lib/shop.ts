@@ -99,6 +99,13 @@ export const barbers: Barber[] = [
     phone: "(323) 715-8982",
     bookingUrl: "https://book.thecut.co/AllHairNoGrease",
   },
+  {
+    name: "Jozey Barber",
+    location: "pigeon-pass",
+    specialty: null,
+    phone: "(951) 419-7695",
+    bookingUrl: "https://getsqr.co/jozey-the-barber-1",
+  },
   { name: "Barber Four", location: "moreno-beach", specialty: "Classic scissor cuts", phone: null, bookingUrl: null, sample: true },
   { name: "Barber Five", location: "moreno-beach", specialty: "Kids' cuts", phone: null, bookingUrl: null, sample: true },
   { name: "Barber Six", location: "moreno-beach", specialty: "Hot towel shaves", phone: null, bookingUrl: null, sample: true },
