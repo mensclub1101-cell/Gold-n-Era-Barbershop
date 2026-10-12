@@ -2,15 +2,41 @@ import Link from "next/link";
 import { SiteHeader, Wordmark } from "@/components/SiteHeader";
 import { StaffGrid } from "@/components/StaffGrid";
 import {
+  barbers,
   brand,
   fullAddress,
   locationName,
   locations,
   mapsUrl,
   reviews,
+  siteUrl,
   telHref,
   type Location,
 } from "@/lib/shop";
+
+// Real reviews only. Sample entries in shop.ts never reach the page.
+const liveReviews = reviews.filter((r) => !r.sample);
+
+// schema.org data so Google can show both shops as one business with two locations.
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": locations.map((l) => ({
+    "@type": "BarberShop",
+    "@id": `${siteUrl}/#${l.slug}`,
+    name: `${brand.name} – ${l.name}`,
+    url: siteUrl,
+    image: l.photo ? `${siteUrl}${l.photo}` : undefined,
+    telephone: l.phone ?? undefined,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: l.street,
+      addressLocality: l.city,
+      addressRegion: l.region,
+      postalCode: l.postalCode,
+      addressCountry: "US",
+    },
+  })),
+};
 
 function SectionHeading({ eyebrow, title, children }: { eyebrow: string; title: string; children?: React.ReactNode }) {
   return (
@@ -23,6 +49,7 @@ function SectionHeading({ eyebrow, title, children }: { eyebrow: string; title: 
 }
 
 function LocationCard({ location, index }: { location: Location; index: number }) {
+  const barberCount = barbers.filter((b) => b.location === location.slug).length;
   return (
     <article className="relative flex min-h-[26rem] flex-col justify-end overflow-hidden rounded-3xl bg-ink text-paper">
       {location.photo ? (
@@ -48,7 +75,10 @@ function LocationCard({ location, index }: { location: Location; index: number }
           <br />
           {location.city}, {location.region} {location.postalCode}
         </address>
-        <p className="mt-3 text-sm text-paper/60">{location.hours ?? "Hours coming soon"}</p>
+        <p className="mt-3 text-sm text-paper/60">
+          {barberCount} {barberCount === 1 ? "barber" : "barbers"}
+          {location.hours && <> · {location.hours}</>}
+        </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <a
             href={mapsUrl(location)}
@@ -67,7 +97,7 @@ function LocationCard({ location, index }: { location: Location; index: number }
             </a>
           )}
           <a
-            href="#staff"
+            href={`#barbers-${location.slug}`}
             className="rounded-full border border-paper/40 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-paper"
           >
             See barbers
@@ -93,6 +123,10 @@ function Stars({ rating }: { rating: number }) {
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+      />
       <SiteHeader />
 
       <main className="flex-1">
@@ -151,25 +185,22 @@ export default function Home() {
 
         {/* Reviews */}
         <section id="reviews" className="scroll-mt-16 mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <SectionHeading eyebrow="Word of mouth" title="Reviews" />
-          <ul className="grid gap-4 md:grid-cols-3">
-            {reviews.map((r, i) => (
-              <li key={i} className="flex flex-col rounded-2xl border border-line p-6">
-                <div className="flex items-center justify-between">
+          <SectionHeading eyebrow="Word of mouth" title="Reviews">
+            {liveReviews.length === 0 && "Been in the chair? Tell people how it went."}
+          </SectionHeading>
+          {liveReviews.length > 0 && (
+            <ul className="grid gap-4 md:grid-cols-3">
+              {liveReviews.map((r, i) => (
+                <li key={i} className="flex flex-col rounded-2xl border border-line p-6">
                   <Stars rating={r.rating} />
-                  {r.sample && (
-                    <span className="rounded-full bg-paper-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted">
-                      Sample
-                    </span>
-                  )}
-                </div>
-                <blockquote className="mt-4 flex-1 text-ink-2">&ldquo;{r.body}&rdquo;</blockquote>
-                <p className="mt-6 text-sm font-semibold">{r.author}</p>
-                <p className="text-xs uppercase tracking-wider text-muted">{locationName(r.location)}</p>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-8 flex flex-wrap gap-3">
+                  <blockquote className="mt-4 flex-1 text-ink-2">&ldquo;{r.body}&rdquo;</blockquote>
+                  <p className="mt-6 text-sm font-semibold">{r.author}</p>
+                  <p className="text-xs uppercase tracking-wider text-muted">{locationName(r.location)}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className={`flex flex-wrap gap-3 ${liveReviews.length > 0 ? "mt-8" : ""}`}>
             {locations.map((l) => (
               <a
                 key={l.slug}

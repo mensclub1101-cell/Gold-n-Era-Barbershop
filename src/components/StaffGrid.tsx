@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { barbers, locations, locationName, telHref } from "@/lib/shop";
 
 const tabs = [{ slug: "all", name: "All" }, ...locations.map((l) => ({ slug: l.slug, name: l.name }))];
@@ -16,6 +16,19 @@ function initials(name: string) {
 
 export function StaffGrid() {
   const [active, setActive] = useState("all");
+
+  // "See barbers" on a location card links to #barbers-<slug>: pick that tab and scroll here.
+  useEffect(() => {
+    function fromHash() {
+      const slug = window.location.hash.match(/^#barbers-(.+)$/)?.[1];
+      if (!slug || !tabs.some((t) => t.slug === slug)) return;
+      setActive(slug);
+      document.getElementById("staff")?.scrollIntoView({ behavior: "smooth" });
+    }
+    fromHash();
+    window.addEventListener("hashchange", fromHash);
+    return () => window.removeEventListener("hashchange", fromHash);
+  }, []);
   const shown = active === "all" ? barbers : barbers.filter((b) => b.location === active);
 
   return (
