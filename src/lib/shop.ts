@@ -117,6 +117,13 @@ export const barbers: Barber[] = [
     phone: "(909) 653-3499",
     bookingUrl: "https://harleystylezcuts.setmore.com",
   },
+  {
+    name: "Joel Barber",
+    location: "moreno-beach",
+    specialty: null,
+    phone: "(562) 619-7623",
+    bookingUrl: "https://squareup.com/appointments/book/LEYATRK2XH1W1",
+  },
 ];
 
 export const reviews: Review[] = [
