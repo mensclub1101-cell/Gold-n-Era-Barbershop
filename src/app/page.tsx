@@ -138,7 +138,7 @@ export default function Home() {
               {brand.city} · Two locations
             </p>
             <h1 className="mt-6 font-display text-6xl font-bold uppercase leading-[0.9] tracking-wide sm:text-8xl">
-              Gold&rsquo;n
+              Golden
               <br />
               Era
             </h1>

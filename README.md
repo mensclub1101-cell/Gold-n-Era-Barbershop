@@ -1,6 +1,6 @@
-# Gold'n Era Barbershop
+# Golden Era Barbershop
 
-Website and booking platform for Gold'n Era Barbershop, a booth-rent shop in Moreno Valley, CA. Built by ProlificX.
+Website and booking platform for Golden Era Barbershop, a booth-rent shop in Moreno Valley, CA. Built by ProlificX.
 
 ## Stack
 - Supabase: database, auth, storage

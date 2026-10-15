@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ComingSoon } from "@/components/ComingSoon";
 
-export const metadata: Metadata = { title: "Sign up | Gold'n Era Barbershop" };
+export const metadata: Metadata = { title: "Sign up | Golden Era Barbershop" };
 
 export default function SignupPage() {
   return (

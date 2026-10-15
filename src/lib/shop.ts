@@ -36,8 +36,8 @@ export type Review = {
 export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
 export const brand = {
-  name: "Gold'n Era Barbershop",
-  wordmark: "Gold'n Era",
+  name: "Golden Era Barbershop",
+  wordmark: "Golden Era",
   tagline: "Classic cuts. Clean fades. Two shops in Moreno Valley.",
   city: "Moreno Valley, CA",
 };
