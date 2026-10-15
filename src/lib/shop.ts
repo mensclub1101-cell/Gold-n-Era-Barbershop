@@ -124,6 +124,13 @@ export const barbers: Barber[] = [
     phone: "(562) 619-7623",
     bookingUrl: "https://squareup.com/appointments/book/LEYATRK2XH1W1",
   },
+  {
+    name: "G Blendz",
+    location: "moreno-beach",
+    specialty: null,
+    phone: "(909) 725-1741",
+    bookingUrl: "https://book.thecut.co/g__blendz247",
+  },
 ];
 
 export const reviews: Review[] = [
