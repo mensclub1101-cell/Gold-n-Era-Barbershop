@@ -20,6 +20,7 @@ export type Barber = {
   specialty: string | null;
   phone: string | null;
   bookingUrl: string | null; // Each booth-rent barber's own booking page
+  instagram?: string | null; // Handle without the @
   sample?: boolean;
 };
 

@@ -1,0 +1,108 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+import { requireRole } from "@/lib/auth";
+import { parseDollars } from "@/lib/format";
+import type { FormState } from "./auth";
+
+// Every action re-checks the role; RLS enforces it again in the database.
+
+function text(formData: FormData, key: string) {
+  const v = formData.get(key);
+  return typeof v === "string" ? v.trim() : "";
+}
+
+function urlOrNull(value: string) {
+  if (!value) return null;
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`;
+}
+
+function done() {
+  revalidatePath("/owner");
+  revalidatePath("/");
+}
+
+export async function addBarber(_prev: FormState, formData: FormData): Promise<FormState> {
+  await requireRole("owner");
+  const displayName = text(formData, "display_name");
+  const shopId = text(formData, "shop_id");
+  if (!displayName || !shopId) return { error: "Enter a name and pick a shop." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("barbers").insert({
+    display_name: displayName,
+    shop_id: shopId,
+    phone: text(formData, "phone") || null,
+    booking_url: urlOrNull(text(formData, "booking_url")),
+  });
+  if (error) return { error: error.message };
+  done();
+  return { notice: `${displayName} added. Send them an invite link so they can manage their card.` };
+}
+
+export async function createInvite(barberId: string) {
+  const viewer = await requireRole("owner");
+  const supabase = await createClient();
+  // One live link per seat: drop any unused ones first.
+  await supabase.from("invites").delete().eq("barber_id", barberId).is("used_at", null);
+  await supabase.from("invites").insert({ role: "barber", barber_id: barberId, created_by: viewer.userId });
+  done();
+}
+
+export async function setBarberActive(barberId: string, active: boolean) {
+  await requireRole("owner");
+  const supabase = await createClient();
+  await supabase.from("barbers").update({ active }).eq("id", barberId);
+  done();
+}
+
+export async function updateShop(shopId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  await requireRole("owner");
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("shops")
+    .update({ phone: text(formData, "phone") || null, hours: text(formData, "hours") || null })
+    .eq("id", shopId);
+  if (error) return { error: error.message };
+  done();
+  return { notice: "Saved." };
+}
+
+export async function addRentCharge(_prev: FormState, formData: FormData): Promise<FormState> {
+  await requireRole("owner");
+  const barberId = text(formData, "barber_id");
+  const dueDate = text(formData, "due_date");
+  const amountCents = parseDollars(formData.get("amount"));
+  if (!barberId) return { error: "Pick a barber." };
+  if (amountCents === null) return { error: "Enter an amount like 250 or 250.00." };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) return { error: "Pick a due date." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("rent_charges").insert({
+    barber_id: barberId,
+    amount_cents: amountCents,
+    due_date: dueDate,
+    note: text(formData, "note") || null,
+  });
+  if (error) return { error: error.message };
+  done();
+  return { notice: "Rent charge added." };
+}
+
+export async function setRentPaid(chargeId: string, paid: boolean) {
+  await requireRole("owner");
+  const supabase = await createClient();
+  await supabase
+    .from("rent_charges")
+    .update({ paid_at: paid ? new Date().toISOString() : null })
+    .eq("id", chargeId);
+  done();
+}
+
+export async function deleteRentCharge(chargeId: string) {
+  await requireRole("owner");
+  const supabase = await createClient();
+  await supabase.from("rent_charges").delete().eq("id", chargeId);
+  done();
+}

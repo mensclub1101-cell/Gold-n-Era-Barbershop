@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { SiteHeader, Wordmark } from "@/components/SiteHeader";
 import { StaffGrid } from "@/components/StaffGrid";
+import { getRoster } from "@/lib/roster";
 import {
-  barbers,
   brand,
   fullAddress,
   locationName,
-  locations,
   mapsUrl,
   reviews,
   siteUrl,
@@ -14,11 +13,14 @@ import {
   type Location,
 } from "@/lib/shop";
 
+// Barbers and shop info come from the database, so render per request.
+export const dynamic = "force-dynamic";
+
 // Real reviews only. Sample entries in shop.ts never reach the page.
 const liveReviews = reviews.filter((r) => !r.sample);
 
 // schema.org data so Google can show both shops as one business with two locations.
-const structuredData = {
+const structuredDataFor = (locations: Location[]) => ({
   "@context": "https://schema.org",
   "@graph": locations.map((l) => ({
     "@type": "BarberShop",
@@ -36,7 +38,7 @@ const structuredData = {
       addressCountry: "US",
     },
   })),
-};
+});
 
 function SectionHeading({ eyebrow, title, children }: { eyebrow: string; title: string; children?: React.ReactNode }) {
   return (
@@ -48,8 +50,7 @@ function SectionHeading({ eyebrow, title, children }: { eyebrow: string; title: 
   );
 }
 
-function LocationCard({ location, index }: { location: Location; index: number }) {
-  const barberCount = barbers.filter((b) => b.location === location.slug).length;
+function LocationCard({ location, index, barberCount }: { location: Location; index: number; barberCount: number }) {
   return (
     <article className="relative flex min-h-[26rem] flex-col justify-end overflow-hidden rounded-3xl bg-ink text-paper">
       {location.photo ? (
@@ -120,12 +121,13 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const { locations, barbers } = await getRoster();
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDataFor(locations)).replace(/</g, "\\u003c") }}
       />
       <SiteHeader />
 
@@ -168,7 +170,12 @@ export default function Home() {
           </SectionHeading>
           <div className="grid gap-6 lg:grid-cols-2">
             {locations.map((l, i) => (
-              <LocationCard key={l.slug} location={l} index={i} />
+              <LocationCard
+                key={l.slug}
+                location={l}
+                index={i}
+                barberCount={barbers.filter((b) => b.location === l.slug).length}
+              />
             ))}
           </div>
         </section>
@@ -179,7 +186,7 @@ export default function Home() {
             <SectionHeading eyebrow="The team" title="Barbers">
               Every barber runs their own chair. Find your barber and book with them directly.
             </SectionHeading>
-            <StaffGrid />
+            <StaffGrid barbers={barbers} locations={locations} />
           </div>
         </section>
 

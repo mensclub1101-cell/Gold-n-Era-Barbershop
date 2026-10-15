@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { barbers, locations, locationName, telHref } from "@/lib/shop";
-
-const tabs = [{ slug: "all", name: "All" }, ...locations.map((l) => ({ slug: l.slug, name: l.name }))];
+import { telHref, type Barber, type Location } from "@/lib/shop";
 
 function initials(name: string) {
   return name
@@ -14,7 +12,9 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export function StaffGrid() {
+export function StaffGrid({ barbers, locations }: { barbers: Barber[]; locations: Location[] }) {
+  const tabs = [{ slug: "all", name: "All" }, ...locations.map((l) => ({ slug: l.slug, name: l.name }))];
+  const locationName = (slug: string) => locations.find((l) => l.slug === slug)?.name ?? slug;
   const [active, setActive] = useState("all");
 
   // "See barbers" on a location card links to #barbers-<slug>: pick that tab and scroll here.
@@ -28,6 +28,8 @@ export function StaffGrid() {
     fromHash();
     window.addEventListener("hashchange", fromHash);
     return () => window.removeEventListener("hashchange", fromHash);
+    // Tabs only change when the roster does; the hash check reads them fresh.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const shown = active === "all" ? barbers : barbers.filter((b) => b.location === active);
 
@@ -89,6 +91,17 @@ export function StaffGrid() {
                 >
                   Booking opens soon
                 </button>
+              )}
+              {b.instagram && (
+                <a
+                  href={`https://instagram.com/${b.instagram}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${b.name} on Instagram`}
+                  className="rounded-full border border-ink px-4 py-2 text-sm font-semibold text-ink transition hover:bg-ink hover:text-paper"
+                >
+                  IG
+                </a>
               )}
               {b.phone && (
                 <a

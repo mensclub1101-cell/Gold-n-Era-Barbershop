@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     url: "/",
   },
   twitter: { card: "summary_large_image", title, description },
+  appleWebApp: { capable: true, title: brand.wordmark, statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = {
