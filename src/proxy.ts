@@ -7,5 +7,5 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // Only routes that read the session. The landing page and static files skip it.
-  matcher: ["/dashboard/:path*", "/owner/:path*", "/barber/:path*", "/client/:path*", "/join/:path*", "/login"],
+  matcher: ["/dashboard/:path*", "/owner/:path*", "/barber/:path*", "/client/:path*", "/join/:path*", "/login", "/signup"],
 };

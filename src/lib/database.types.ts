@@ -98,6 +98,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string;
+          favorite_barber_id: string | null;
           full_name: string | null;
           id: string;
           phone: string | null;
@@ -105,10 +106,19 @@ export type Database = {
         };
         Insert: never;
         Update: {
+          favorite_barber_id?: string | null;
           full_name?: string | null;
           phone?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "profiles_favorite_barber_id_fkey";
+            columns: ["favorite_barber_id"];
+            isOneToOne: false;
+            referencedRelation: "barbers";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       rent_charges: {
         Row: {

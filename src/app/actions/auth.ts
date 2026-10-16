@@ -62,3 +62,29 @@ export async function signUpWithInvite(token: string, _prev: FormState, formData
   }
   return claim(token);
 }
+
+// Public sign-up. Every new account is a client; staff roles only come from
+// invites.
+export async function signUp(_prev: FormState, formData: FormData): Promise<FormState> {
+  const fullName = text(formData, "full_name");
+  const email = text(formData, "email");
+  const phone = text(formData, "phone");
+  const password = text(formData, "password");
+  if (!fullName || !email) return { error: "Enter your name and email." };
+  if (password.length < 8) return { error: "Use a password with at least 8 characters." };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { full_name: fullName, phone } },
+  });
+  if (error) {
+    if (error.code === "user_already_exists") return { error: "That email already has an account. Log in instead." };
+    return { error: error.message };
+  }
+  // Supabase hides existing emails by returning a user with no identities.
+  if (data.user?.identities?.length === 0) return { error: "That email already has an account. Log in instead." };
+  if (!data.session) return { notice: "Check your email to confirm your account, then log in." };
+  redirect("/client");
+}

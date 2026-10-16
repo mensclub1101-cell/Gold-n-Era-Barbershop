@@ -19,7 +19,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       <main className="flex flex-1 items-center justify-center px-4 py-16">
         <div className="w-full max-w-md rounded-3xl border border-line p-6 sm:p-8">
           <h1 className="font-display text-4xl font-semibold uppercase tracking-wide">Log in</h1>
-          <p className="mt-2 text-sm text-muted">Barbers and the shop owner log in here.</p>
+          <p className="mt-2 text-sm text-muted">Clients, barbers and the shop owner all log in here.</p>
           <ActionForm action={signIn} className="mt-6 space-y-4">
             {next && <input type="hidden" name="next" value={next} />}
             <Field label="Email" name="email" type="email" autoComplete="email" required />
@@ -27,11 +27,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
             <SubmitButton className="w-full">Log in</SubmitButton>
           </ActionForm>
           <p className="mt-6 text-sm text-muted">
-            New barber? Use the invite link the owner sent you.{" "}
-            <Link href="/" className="font-semibold text-ink underline">
-              Back to home
+            New here?{" "}
+            <Link href="/signup" className="font-semibold text-ink underline">
+              Create an account
             </Link>
           </p>
+          <p className="mt-2 text-sm text-muted">New barber? Use the invite link the owner sent you.</p>
         </div>
       </main>
     </>

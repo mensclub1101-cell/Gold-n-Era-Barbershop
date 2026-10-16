@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { createContext, startTransition, useActionState, useContext, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import type { FormState } from "@/app/actions/auth";
 
@@ -43,8 +43,12 @@ export function Field({
   );
 }
 
+// ActionForm submits in a transition, which useFormStatus can't see.
+const PendingContext = createContext(false);
+
 export function SubmitButton({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  const { pending } = useFormStatus();
+  const status = useFormStatus();
+  const pending = useContext(PendingContext) || status.pending;
   return (
     <button
       type="submit"
@@ -68,14 +72,26 @@ export function ActionForm({
   className?: string;
   resetOnSuccess?: boolean;
 }) {
-  const [state, formAction] = useActionState(action, undefined);
+  const [state, formAction, isPending] = useActionState(action, undefined);
   const formRef = useRef<HTMLFormElement>(null);
   useEffect(() => {
     if (resetOnSuccess && state?.notice) formRef.current?.reset();
   }, [state, resetOnSuccess]);
+  // Submit through onSubmit rather than the action prop: React resets forms
+  // after an action prop runs, which would wipe what people typed on an error.
+  // The action prop stays as the no-JS fallback.
   return (
-    <form ref={formRef} action={formAction} className={className}>
-      {children}
+    <form
+      ref={formRef}
+      action={formAction}
+      onSubmit={(e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        startTransition(() => formAction(formData));
+      }}
+      className={className}
+    >
+      <PendingContext value={isPending}>{children}</PendingContext>
       {state?.error && (
         <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
           {state.error}
